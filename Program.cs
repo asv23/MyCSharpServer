@@ -16,7 +16,7 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 // app.UseMiddleware<LoggingMiddleware>();
-// app.UseMiddleware<JsonValidationMiddleware>();
+app.UseMiddleware<JsonValidationMiddleware>();
 app.UseMiddleware<JsonModificationMiddleware>();
 
 app.MapControllers();
