@@ -17,7 +17,7 @@ var app = builder.Build();
 
 // app.UseMiddleware<LoggingMiddleware>();
 // app.UseMiddleware<JsonValidationMiddleware>();
-// app.UseMiddleware<JsonModificationMiddleware>();
+app.UseMiddleware<JsonModificationMiddleware>();
 
 app.MapControllers();
 
