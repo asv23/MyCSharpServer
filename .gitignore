@@ -1,0 +1,46 @@
+# .NET Core build output
+/bin/
+/obj/
+
+# Visual Studio / Rider temporary files
+/.idea/
+/.vscode/
+/.vs/
+
+# User-specific files
+*.user
+*.userprefs
+
+# Dependency directories
+/packages/
+/node_modules/
+
+# NuGet cache
+~/.nuget/packages/
+
+# Logs and other runtime files
+*.log
+/logs/
+/app.log
+
+# Environment-specific files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# macOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# Test results
+/TestResults/
+/coverage/
+
+# Miscellaneous
+*.swp
+*.swo
+*~
