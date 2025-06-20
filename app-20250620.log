@@ -1,0 +1,54 @@
+2025-06-20T15:48:54.5413200+03:00  [INF] Now listening on: "http://localhost:5285" (d826f4b8)
+2025-06-20T15:48:54.5558324+03:00  [INF] Application started. Press Ctrl+C to shut down. (dcaefe54)
+2025-06-20T15:48:54.5563825+03:00  [INF] Hosting environment: "Development" (bc5a1a4e)
+2025-06-20T15:48:54.5564364+03:00  [INF] Content root path: "/home/sve/Test Apps/HelloApi" (cc26f24e)
+2025-06-20T15:51:58.0022643+03:00 0HNDFV4V19M0J:00000001 [INF] Request starting "HTTP/1.1" "POST" "http"://"localhost:5285""""/messager""" - "application/json" 63 (d509f86a)
+2025-06-20T15:51:58.0345718+03:00 0HNDFV4V19M0J:00000001 [ERR] JsonValidationMiddleware: Failed to parse JSON from request body (73ffb4f8)
+System.NotSupportedException: Specified method is not supported.
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpRequestStream.set_Position(Int64 value)
+   at JsonValidationMiddleware.InvokeAsync(HttpContext context) in /home/sve/Test Apps/HelloApi/middleware/JsonValidationMiddleware.cs:line 34
+2025-06-20T15:51:58.0376805+03:00 0HNDFV4V19M0J:00000001 [INF] Request finished "HTTP/1.1" "POST" "http"://"localhost:5285""""/messager""" - 400 null null 36.7356ms (74253ad3)
+2025-06-20T15:52:04.4605237+03:00 0HNDFV4V19M0K:00000001 [INF] Request starting "HTTP/1.1" "GET" "http"://"localhost:5285""""/""" - null null (d509f86a)
+2025-06-20T15:52:04.4659499+03:00 0HNDFV4V19M0K:00000001 [INF] JsonModificationMiddleware: Starting JSON modification process. (50c79638)
+2025-06-20T15:52:04.4663754+03:00 0HNDFV4V19M0K:00000001 [INF] Request finished "HTTP/1.1" "GET" "http"://"localhost:5285""""/""" - 404 0 null 5.8617ms (74253ad3)
+2025-06-20T15:52:04.4678027+03:00 0HNDFV4V19M0K:00000001 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: "GET" "http"://"localhost:5285""""/", Response status code: 404 (e353595a)
+2025-06-20T15:55:00.9180425+03:00 0HNDFV4V19M0N:00000001 [INF] Request starting "HTTP/1.1" "POST" "http"://"localhost:5285""""/messager""" - "application/json" 63 (d509f86a)
+2025-06-20T15:55:00.9191962+03:00 0HNDFV4V19M0N:00000001 [ERR] JsonValidationMiddleware: Failed to parse JSON from request body (73ffb4f8)
+System.NotSupportedException: Specified method is not supported.
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpRequestStream.set_Position(Int64 value)
+   at JsonValidationMiddleware.InvokeAsync(HttpContext context) in /home/sve/Test Apps/HelloApi/middleware/JsonValidationMiddleware.cs:line 34
+2025-06-20T15:55:00.9193646+03:00 0HNDFV4V19M0N:00000001 [INF] Request finished "HTTP/1.1" "POST" "http"://"localhost:5285""""/messager""" - 400 null null 1.4124ms (74253ad3)
+2025-06-20T15:55:59.1348770+03:00  [INF] Application is shutting down... (90f52c38)
+2025-06-20T15:56:11.5271820+03:00  [INF] Now listening on: "http://localhost:5285" (d826f4b8)
+2025-06-20T15:56:11.5416870+03:00  [INF] Application started. Press Ctrl+C to shut down. (dcaefe54)
+2025-06-20T15:56:11.5421545+03:00  [INF] Hosting environment: "Development" (bc5a1a4e)
+2025-06-20T15:56:11.5422201+03:00  [INF] Content root path: "/home/sve/Test Apps/HelloApi" (cc26f24e)
+2025-06-20T15:56:13.9995512+03:00 0HNDFV7BAN3IB:00000001 [INF] Request starting "HTTP/1.1" "POST" "http"://"localhost:5285""""/messager""" - "application/json" 63 (d509f86a)
+2025-06-20T15:56:14.0458058+03:00 0HNDFV7BAN3IB:00000001 [INF] JsonValidationMiddleware: Successfully parsed JSON. Body: "{
+    \"message\": \"Hello World, CSharp!\",
+    \"user\": \"asv\"
+}" (8944c866)
+2025-06-20T15:56:14.0481389+03:00 0HNDFV7BAN3IB:00000001 [INF] JsonModificationMiddleware: Starting JSON modification process. (50c79638)
+2025-06-20T15:56:14.1357556+03:00 0HNDFV7BAN3IB:00000001 [INF] JsonModificationMiddleware: Added timestamp to JSON. Modified body: "{\"message\":\"Hello World, CSharp!\",\"user\":\"asv\",\"timestamp\":\"2025-06-20 12:56:14\"}" (5da9edd3)
+2025-06-20T15:56:14.1372908+03:00 0HNDFV7BAN3IB:00000001 [INF] Executing endpoint '"MessagerController.Post (HelloApi)"' (500cc934)
+2025-06-20T15:56:14.1442814+03:00 0HNDFV7BAN3IB:00000001 [INF] Route matched with "{action = \"Post\", controller = \"Messager\"}". Executing controller action with signature "Microsoft.AspNetCore.Mvc.IActionResult Post()" on controller "MessagerController" ("HelloApi"). (122b2fdf)
+2025-06-20T15:56:14.1453573+03:00 0HNDFV7BAN3IB:00000001 [INF] MessagerController: Returning modified JSON to client (f6863240)
+2025-06-20T15:56:14.1462531+03:00 0HNDFV7BAN3IB:00000001 [INF] Executing ContentResult with HTTP Response ContentType of "application/json" (7ec2a4e9)
+2025-06-20T15:56:14.1503142+03:00 0HNDFV7BAN3IB:00000001 [INF] Executed action "MessagerController.Post (HelloApi)" in 3.426ms (afa2e885)
+2025-06-20T15:56:14.1503959+03:00 0HNDFV7BAN3IB:00000001 [INF] Executed endpoint '"MessagerController.Post (HelloApi)"' (99874f2b)
+2025-06-20T15:56:14.1514280+03:00 0HNDFV7BAN3IB:00000001 [INF] Request finished "HTTP/1.1" "POST" "http"://"localhost:5285""""/messager""" - 200 81 "application/json" 152.8582ms (74253ad3)
+2025-06-20T16:03:45.6545749+03:00 0HNDFV7BAN3IC:00000001 [INF] Request starting "HTTP/1.1" "POST" "http"://"localhost:5285""""/messager""" - "application/json" 63 (d509f86a)
+2025-06-20T16:03:45.6558926+03:00 0HNDFV7BAN3IC:00000001 [INF] JsonValidationMiddleware: Successfully parsed JSON. Body: "{
+    \"message\": \"Hello World, CSharp!\",
+    \"user\": \"asv\"
+}" (8944c866)
+2025-06-20T16:03:45.6565466+03:00 0HNDFV7BAN3IC:00000001 [INF] JsonModificationMiddleware: Starting JSON modification process. (50c79638)
+2025-06-20T16:03:45.6568958+03:00 0HNDFV7BAN3IC:00000001 [INF] JsonModificationMiddleware: Added timestamp to JSON. Modified body: "{\"message\":\"Hello World, CSharp!\",\"user\":\"asv\",\"timestamp\":\"2025-06-20 13:03:45\"}" (5da9edd3)
+2025-06-20T16:03:45.6569649+03:00 0HNDFV7BAN3IC:00000001 [INF] Executing endpoint '"MessagerController.Post (HelloApi)"' (500cc934)
+2025-06-20T16:03:45.6571152+03:00 0HNDFV7BAN3IC:00000001 [INF] Route matched with "{action = \"Post\", controller = \"Messager\"}". Executing controller action with signature "Microsoft.AspNetCore.Mvc.IActionResult Post()" on controller "MessagerController" ("HelloApi"). (122b2fdf)
+2025-06-20T16:03:45.6572645+03:00 0HNDFV7BAN3IC:00000001 [INF] MessagerController: Returning modified JSON to client (f6863240)
+2025-06-20T16:03:45.6574184+03:00 0HNDFV7BAN3IC:00000001 [INF] Executing ContentResult with HTTP Response ContentType of "application/json" (7ec2a4e9)
+2025-06-20T16:03:45.6578436+03:00 0HNDFV7BAN3IC:00000001 [INF] Executed action "MessagerController.Post (HelloApi)" in 0.6393ms (afa2e885)
+2025-06-20T16:03:45.6578981+03:00 0HNDFV7BAN3IC:00000001 [INF] Executed endpoint '"MessagerController.Post (HelloApi)"' (99874f2b)
+2025-06-20T16:03:45.6580681+03:00 0HNDFV7BAN3IC:00000001 [INF] Request finished "HTTP/1.1" "POST" "http"://"localhost:5285""""/messager""" - 200 81 "application/json" 3.5359ms (74253ad3)
+2025-06-20T16:10:12.1890468+03:00  [INF] Application is shutting down... (90f52c38)
