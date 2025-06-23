@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
@@ -20,19 +21,25 @@ public class JsonModificationMiddleware
     // ---------------------------------------------------
     public async Task InvokeAsync(HttpContext context)
     {
+        if (context.Items.TryGetValue("ValidationFailed", out var failed) && (failed as bool?) == true)
+        {
+            await _next(context);
+            return;
+        }
+        
         Console.WriteLine("Middleware 3: JSON Modification");
         LoggerExtensions.LogInformation(_logger, "JsonModificationMiddleware: Starting JSON modification process.");
 
         try
         {
-            string body = GetRequestBody(context);
-            string modifiedJson = ProcessJsonBody(body);
+            var body = GetRequestBody(context);
+            var modifiedJson = ProcessJsonBody(body);
 
             StoreModifiedBody(context, modifiedJson);
         }
         catch (Exception ex)
         {
-            HandleJsonProcessingError(context, ex);
+            await HandleJsonProcessingError(context, ex);
             return;
         }
 
@@ -42,16 +49,15 @@ public class JsonModificationMiddleware
     // ---------------------------------------------------
     // Process
     // ---------------------------------------------------
-    private string GetRequestBody(HttpContext context)
+    private JObject? GetRequestBody(HttpContext context)
     {
-        return context.Items["RequestBody"] as string;
+        return context.Items["ParsedJson"] as JObject;
     }
 
-    private string ProcessJsonBody(string body)
+    private string ProcessJsonBody(JObject? body)
     {
-        var jsonObject = JsonConvert.DeserializeObject<dynamic>(body);
-        jsonObject.timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
-        return JsonConvert.SerializeObject(jsonObject);
+        body.Add("timestamp", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
+        return JsonConvert.SerializeObject(body);
     }
 
     // ---------------------------------------------------
@@ -72,6 +78,7 @@ public class JsonModificationMiddleware
         _logger.LogError(ex, "JsonModificationMiddleware: Failed to modify JSON. Body: {0}", body);
         
         context.Response.StatusCode = 500;
-        await context.Response.WriteAsync("Error processing JSON");
+        await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Error processing JSON." }));
+        // await context.Response.WriteAsync("Error processing JSON.");
     }
 }
