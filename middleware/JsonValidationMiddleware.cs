@@ -29,8 +29,14 @@ public class JsonValidationMiddleware
             var continueProcess = await ProcessRequest(context);
             if(!continueProcess) 
             {
+                context.Items["ValidationFailed"] = true;
                 return;
             }
+        }
+        else
+        {
+            context.Items["ValidationFailed"] = true;
+            return;
         }
 
         await _next(context);
@@ -59,13 +65,11 @@ public class JsonValidationMiddleware
             return false;
         }
 
-        if(!TryParseJson(body, out Exception JsonException))
+        if(!TryProcessJson(context, body, out Exception JsonException))
         {
             await HandleJsonParseError(context, JsonException);
             return false;
         }
-        
-        await ProcessValidJson(context, body);
         return true;
     }
 
@@ -84,26 +88,16 @@ public class JsonValidationMiddleware
     }
 
     // ---------------------------------------------------
-    // Valid Json Process
-    // ---------------------------------------------------
-    private async Task ProcessValidJson(HttpContext context, string body)
-    {
-        _logger.LogInformation("JsonValidationMiddleware: Successfully parsed JSON. Body: {body}", body);
-
-        context.Items["RequestBody"] = body;
-
-        var newBodyStream = new MemoryStream(Encoding.UTF8.GetBytes(body));
-        context.Request.Body = newBodyStream;
-    }
-
-    // ---------------------------------------------------
     // Custom Error Handler
     // ---------------------------------------------------
     private async Task HandleEmptyBodyError(HttpContext context)
     {
         _logger.LogError("JsonValidationMiddleware: Request body is empty.");
         context.Response.StatusCode = 422;
-        await context.Response.WriteAsync("{\"error\": \"Request body is empty.\"}");
+        await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Request body is empty." }));
+        // await context.Response.WriteAsync("{\"error\": \"Request body is empty.\"}");
+        context.Items["ValidationFailed"] = true;
+        return;
     }
     
     private async Task HandleJsonParseError(HttpContext context, Exception error)
@@ -112,28 +106,36 @@ public class JsonValidationMiddleware
         {
             _logger.LogError(error, "JsonValidationMiddleware: Failed to parse JSON from request body");
             context.Response.StatusCode = 400;
-            await context.Response.WriteAsync("{\"error\": \"Invalid JSON format.\"}");
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Invalid JSON format." }));
+            // await context.Response.WriteAsync("{\"error\": \"Invalid JSON format.\"}");
         }
         else
         {
             _logger.LogError(error, "JsonValidationMiddleware: Unexpected error while processing request body");
             context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("{\"error\": \"Internal server error.\"}");
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Internal server error." }));
+            // await context.Response.WriteAsync("{\"error\": \"Internal server error.\"}");
         }
     }
 
     // ---------------------------------------------------
-    // Error Handler
+    // Valid Json Process
     // ---------------------------------------------------
-    private bool TryParseJson(string json, out Exception error)
+    private bool TryProcessJson(HttpContext context, string json, out Exception error)
     {
         try
         {
-            JsonConvert.DeserializeObject(json);
+            var jsonObject = JsonConvert.DeserializeObject(json);
+            context.Items["ParsedJson"] = jsonObject;
+            _logger.LogInformation("JsonValidationMiddleware: Successfully parsed JSON. Body: {body}", json);
+
+            // var newBodyStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            // context.Request.Body = newBodyStream;
+
             error = null;
             return true;
         }
-        catch (JsonException ex)
+        catch (Exception ex)
         {
             error = ex;
             return false;
