@@ -65,9 +65,13 @@ public class JsonValidationMiddleware
             return false;
         }
 
-        if(!TryProcessJson(context, body, out Exception JsonException))
+        try
         {
-            await HandleJsonParseError(context, JsonException);
+            TryProcessJson(context, body);
+        }
+        catch(Exception ex)
+        {
+            await HandleJsonParseError(context, ex);
             return false;
         }
         return true;
@@ -96,8 +100,6 @@ public class JsonValidationMiddleware
         context.Response.StatusCode = 422;
         await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Request body is empty." }));
         // await context.Response.WriteAsync("{\"error\": \"Request body is empty.\"}");
-        context.Items["ValidationFailed"] = true;
-        return;
     }
     
     private async Task HandleJsonParseError(HttpContext context, Exception error)
@@ -121,24 +123,13 @@ public class JsonValidationMiddleware
     // ---------------------------------------------------
     // Valid Json Process
     // ---------------------------------------------------
-    private bool TryProcessJson(HttpContext context, string json, out Exception error)
+    private void TryProcessJson(HttpContext context, string json)
     {
-        try
-        {
-            var jsonObject = JsonConvert.DeserializeObject(json);
-            context.Items["ParsedJson"] = jsonObject;
-            _logger.LogInformation("JsonValidationMiddleware: Successfully parsed JSON. Body: {body}", json);
+        var jsonObject = JsonConvert.DeserializeObject(json);
+        context.Items["ParsedJson"] = jsonObject;
+        _logger.LogInformation("JsonValidationMiddleware: Successfully parsed JSON. Body: {body}", json);
 
-            // var newBodyStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            // context.Request.Body = newBodyStream;
-
-            error = null;
-            return true;
-        }
-        catch (Exception ex)
-        {
-            error = ex;
-            return false;
-        }
+        // var newBodyStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        // context.Request.Body = newBodyStream;
     }
 }
