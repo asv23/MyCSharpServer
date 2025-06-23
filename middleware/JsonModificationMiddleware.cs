@@ -15,60 +15,63 @@ public class JsonModificationMiddleware
         _logger = logger;
     }
 
+    // ---------------------------------------------------
+    // main
+    // ---------------------------------------------------
     public async Task InvokeAsync(HttpContext context)
     {
         Console.WriteLine("Middleware 3: JSON Modification");
         LoggerExtensions.LogInformation(_logger, "JsonModificationMiddleware: Starting JSON modification process.");
 
-        if (context.Request.Method == "POST" && context.Request.Path == "/messager")
+        try
         {
-            if (context.Items.TryGetValue("RequestBody", out var bodyObj) && bodyObj is string body)
-            {
-                if (string.IsNullOrEmpty(body))
-                {
-                    LoggerExtensions.LogWarning(_logger, "JsonModificationMiddleware: Request body is empty or null.");
-                    context.Response.StatusCode = 400;
-                    await context.Response.WriteAsync("Request body is empty");
-                    return;
-                }
+            string body = GetRequestBody(context);
+            string modifiedJson = ProcessJsonBody(body);
 
-                try
-                {
-                    var jsonObject = JsonConvert.DeserializeObject<dynamic>(body);
-                    if (jsonObject == null)
-                    {
-                        LoggerExtensions.LogError(_logger, "JsonModificationMiddleware: Failed to deserialize JSON. Body: {0}", body);
-                        context.Response.StatusCode = 400;
-                        await context.Response.WriteAsync("Invalid JSON format");
-                        return;
-                    }
-
-                    jsonObject.timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
-                    var modifiedJson = JsonConvert.SerializeObject(jsonObject);
-                    if (modifiedJson == null)
-                    {
-                        LoggerExtensions.LogError(_logger, "JsonModificationMiddleware: Failed to serialize modified JSON.");
-                        context.Response.StatusCode = 500;
-                        await context.Response.WriteAsync("Error serializing JSON");
-                        return;
-                    }
-
-                    context.Items["ModifiedBody"] = modifiedJson;
-                    LoggerExtensions.LogInformation(_logger, "JsonModificationMiddleware: Added timestamp to JSON. Modified body: {0}", modifiedJson);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "JsonModificationMiddleware: Failed to modify JSON. Body: {0}", body);
-                    context.Response.StatusCode = 500;
-                    await context.Response.WriteAsync("Error processing JSON");
-                    return;
-                }
-            }
-            else
-            {
-                LoggerExtensions.LogWarning(_logger, "JsonModificationMiddleware: Request body not found in context.Items.");
-            }
+            StoreModifiedBody(context, modifiedJson);
         }
+        catch (Exception ex)
+        {
+            HandleJsonProcessingError(context, ex);
+            return;
+        }
+
         await _next(context);
+    }
+
+    // ---------------------------------------------------
+    // Process
+    // ---------------------------------------------------
+    private string GetRequestBody(HttpContext context)
+    {
+        return context.Items["RequestBody"] as string;
+    }
+
+    private string ProcessJsonBody(string body)
+    {
+        var jsonObject = JsonConvert.DeserializeObject<dynamic>(body);
+        jsonObject.timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+        return JsonConvert.SerializeObject(jsonObject);
+    }
+
+    // ---------------------------------------------------
+    // Save&Store Modified Body
+    // ---------------------------------------------------
+    private void StoreModifiedBody(HttpContext context, string modifiedJson)
+    {
+        context.Items["ModifiedBody"] = modifiedJson;
+        LoggerExtensions.LogInformation(_logger, "JsonModificationMiddleware: Added timestamp to JSON. Modified body: {0}", modifiedJson);
+    }
+
+    // ---------------------------------------------------
+    // Error Handler
+    // ---------------------------------------------------
+    private async Task HandleJsonProcessingError(HttpContext context, Exception ex)
+    {
+        string body = context.Items["RequestBody"] as string;
+        _logger.LogError(ex, "JsonModificationMiddleware: Failed to modify JSON. Body: {0}", body);
+        
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync("Error processing JSON");
     }
 }
