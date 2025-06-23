@@ -21,7 +21,7 @@ public class MessagerController : ControllerBase
             _logger.LogError("MessagerController: Failed to retrieve modified JSON");
             return StatusCode(500, "Internal server error");
         }
-        _logger.LogInformation("MessagerController: Returning modified JSON to client")
+        _logger.LogInformation("MessagerController: Returning modified JSON to client");
         return Content(modifiedBody.ToString()!, "application/json");
     }
 }
