@@ -70,22 +70,4 @@ public class JsonModificationMiddleware
         context.Items["ModifiedBody"] = modifiedJson;
         LoggerExtensions.LogInformation(_logger, "JsonModificationMiddleware: Added timestamp to JSON. Modified body: {0}", modifiedJson);
     }
-
-    // ---------------------------------------------------
-    // Error Handler
-    // ---------------------------------------------------
-    // private async Task HandleJsonProcessingError(HttpContext context, Exception ex)
-    // {
-    //     // string body = context.Items["RequestBody"] as string;
-    //     // _logger.LogError(ex, "JsonModificationMiddleware: Failed to modify JSON. Body: {0}", body);
-    //     // context.Response.StatusCode = 500;
-    //     // await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Error processing JSON." }));
-        
-    //     int statusCode = 500;
-    //     string title = "JsonValidationMiddleware: Unexpected error while processing request body.";
-    //     string message = "Internal server error.";
-    //     string body = context.Items["RequestBody"] as string;
-
-    //     ResponseWithCode(context, _logger, statusCode, title, message, ex, body);
-    // }
 }
