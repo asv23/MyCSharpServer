@@ -5,6 +5,8 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
+using static ErrorResponseHelper;
+
 public class JsonModificationMiddleware
 {
     private readonly RequestDelegate _next;
@@ -39,7 +41,7 @@ public class JsonModificationMiddleware
         }
         catch (Exception ex)
         {
-            await HandleJsonProcessingError(context, ex);
+            await HandleJsonProcessingError(context, ex, _logger, context.Items["RequestBody"] as string);
             return;
         }
 
@@ -72,13 +74,18 @@ public class JsonModificationMiddleware
     // ---------------------------------------------------
     // Error Handler
     // ---------------------------------------------------
-    private async Task HandleJsonProcessingError(HttpContext context, Exception ex)
-    {
-        string body = context.Items["RequestBody"] as string;
-        _logger.LogError(ex, "JsonModificationMiddleware: Failed to modify JSON. Body: {0}", body);
+    // private async Task HandleJsonProcessingError(HttpContext context, Exception ex)
+    // {
+    //     // string body = context.Items["RequestBody"] as string;
+    //     // _logger.LogError(ex, "JsonModificationMiddleware: Failed to modify JSON. Body: {0}", body);
+    //     // context.Response.StatusCode = 500;
+    //     // await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Error processing JSON." }));
         
-        context.Response.StatusCode = 500;
-        await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Error processing JSON." }));
-        // await context.Response.WriteAsync("Error processing JSON.");
-    }
+    //     int statusCode = 500;
+    //     string title = "JsonValidationMiddleware: Unexpected error while processing request body.";
+    //     string message = "Internal server error.";
+    //     string body = context.Items["RequestBody"] as string;
+
+    //     ResponseWithCode(context, _logger, statusCode, title, message, ex, body);
+    // }
 }
