@@ -16,15 +16,12 @@ public class MessagerController : ControllerBase
     [HttpPost]
     public IActionResult Post()
     {
-        if (HttpContext.Items.TryGetValue("ModifiedBody", out var modifiedBody) && modifiedBody is string json)
-        {
-            _logger.LogInformation("MessagerController: Returning modified JSON to client");
-            return Content(json, "application/json");
-        }
-        else
+        if (!HttpContext.Items.TryGetValue("ModifiedBody", out var modifiedBody) || modifiedBody == null)
         {
             _logger.LogError("MessagerController: Failed to retrieve modified JSON");
             return StatusCode(500, "Internal server error");
         }
+        _logger.LogInformation("MessagerController: Returning modified JSON to client");
+        return Content(modifiedBody.ToString()!, "application/json");
     }
 }
