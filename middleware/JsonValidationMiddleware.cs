@@ -5,6 +5,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
+using static ErrorResponseHelper;
+
 public class JsonValidationMiddleware
 {
     private readonly RequestDelegate _next;
@@ -15,7 +17,6 @@ public class JsonValidationMiddleware
         _next = next;
         _logger = logger;
     }
-
 
     // ---------------------------------------------------
     // main
@@ -61,7 +62,7 @@ public class JsonValidationMiddleware
 
         if(string.IsNullOrEmpty(body))
         {
-            await HandleEmptyBodyError(context);
+            await HandleEmptyBodyError(context, _logger);
             return false;
         }
 
@@ -71,7 +72,7 @@ public class JsonValidationMiddleware
         }
         catch(Exception ex)
         {
-            await HandleJsonParseError(context, ex);
+            await HandleJsonParseError(context, ex, _logger);
             return false;
         }
         return true;
@@ -92,35 +93,6 @@ public class JsonValidationMiddleware
     }
 
     // ---------------------------------------------------
-    // Custom Error Handler
-    // ---------------------------------------------------
-    private async Task HandleEmptyBodyError(HttpContext context)
-    {
-        _logger.LogError("JsonValidationMiddleware: Request body is empty.");
-        context.Response.StatusCode = 422;
-        await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Request body is empty." }));
-        // await context.Response.WriteAsync("{\"error\": \"Request body is empty.\"}");
-    }
-    
-    private async Task HandleJsonParseError(HttpContext context, Exception error)
-    {
-        if (error is JsonException)
-        {
-            _logger.LogError(error, "JsonValidationMiddleware: Failed to parse JSON from request body");
-            context.Response.StatusCode = 400;
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Invalid JSON format." }));
-            // await context.Response.WriteAsync("{\"error\": \"Invalid JSON format.\"}");
-        }
-        else
-        {
-            _logger.LogError(error, "JsonValidationMiddleware: Unexpected error while processing request body");
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Internal server error." }));
-            // await context.Response.WriteAsync("{\"error\": \"Internal server error.\"}");
-        }
-    }
-
-    // ---------------------------------------------------
     // Valid Json Process
     // ---------------------------------------------------
     private void TryProcessJson(HttpContext context, string json)
@@ -128,8 +100,5 @@ public class JsonValidationMiddleware
         var jsonObject = JsonConvert.DeserializeObject(json);
         context.Items["ParsedJson"] = jsonObject;
         _logger.LogInformation("JsonValidationMiddleware: Successfully parsed JSON. Body: {body}", json);
-
-        // var newBodyStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-        // context.Request.Body = newBodyStream;
     }
 }
