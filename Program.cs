@@ -5,6 +5,11 @@ using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5285);
+});
+
 builder.Services.AddLogging(logging =>
 {
     logging.AddConsole();
