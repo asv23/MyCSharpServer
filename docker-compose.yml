@@ -1,0 +1,8 @@
+services:
+  aspnet_server:
+    build: .
+    container_name: aspnet_container
+    ports:
+      - "5285:5285"
+    environment:
+      - ASPNETCORE_HTTP_PORTS=5285
