@@ -5,6 +5,8 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
+using static ErrorResponseHelper;
+
 public class JsonModificationMiddleware
 {
     private readonly RequestDelegate _next;
@@ -39,7 +41,7 @@ public class JsonModificationMiddleware
         }
         catch (Exception ex)
         {
-            await HandleJsonProcessingError(context, ex);
+            await HandleJsonProcessingError(context, ex, _logger, context.Items["RequestBody"] as string);
             return;
         }
 
@@ -67,18 +69,5 @@ public class JsonModificationMiddleware
     {
         context.Items["ModifiedBody"] = modifiedJson;
         LoggerExtensions.LogInformation(_logger, "JsonModificationMiddleware: Added timestamp to JSON. Modified body: {0}", modifiedJson);
-    }
-
-    // ---------------------------------------------------
-    // Error Handler
-    // ---------------------------------------------------
-    private async Task HandleJsonProcessingError(HttpContext context, Exception ex)
-    {
-        string body = context.Items["RequestBody"] as string;
-        _logger.LogError(ex, "JsonModificationMiddleware: Failed to modify JSON. Body: {0}", body);
-        
-        context.Response.StatusCode = 500;
-        await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = "Error processing JSON." }));
-        // await context.Response.WriteAsync("Error processing JSON.");
     }
 }
