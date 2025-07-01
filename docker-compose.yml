@@ -1,7 +1,8 @@
 services:
   aspnet_server:
-    build: .
-    container_name: aspnet_container
+    image: aspnet-swarm-test
+    # build: .
+    # container_name: aspnet_container
     ports:
       - "5285:5285"
     environment:
